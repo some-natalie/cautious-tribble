@@ -1,11 +1,7 @@
 name: run bincapz and fail on changing capz
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - "docs/**"
+  workflow_dispatch:
 
 jobs:
   bincapz:
