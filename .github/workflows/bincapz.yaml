@@ -1,0 +1,69 @@
+name: run bincapz and fail on changing capz
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+
+jobs:
+  bincapz:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout original code (HEAD^1)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          path: "prior-commit"
+
+      - name: Actually roll back to the prior commit in that directory
+        run: git checkout HEAD^1
+        working-directory: prior-commit
+
+      # do any build steps in the prior-commit directory if/as needed
+
+      - name: Checkout the current code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          path: "current-commit"
+
+      # do any build steps in the current-commit directory if/as needed
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+
+      - name: Install bincapz
+        run: go install github.com/chainguard-dev/bincapz@latest
+
+      - name: Set up report
+        run: echo "## Binary Capz Report" > $GITHUB_STEP_SUMMARY
+
+      # run bincapz
+      - name: Run bincapz
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          for file in $(ls current-commit); do
+            if [ ! -f previous-commit/$file ]; then
+                echo "File $file does not exist in the previous commit"
+                bincapz --format=markdown current-commit/$file >> >> $GITHUB_STEP_SUMMARY
+            fi
+            bincapz --diff --format=markdown current-commit/$file previous-commit/$file >> $GITHUB_STEP_SUMMARY
+          done
+
+      # add github_step_summary to the PR
+      - name: Comment on PR
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: fs.readFileSync(process.env.GITHUB_STEP_SUMMARY, 'utf8')
+            })
