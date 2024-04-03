@@ -65,9 +65,11 @@ jobs:
       - name: Diff bincapz results
         shell: bash
         run: |
-          echo "## Diff of bincapz results" > $GITHUB_STEP_SUMMARY
-          diff prior-results/report.md current-results/report.md >> $GITHUB_STEP_SUMMARY
-          exit 0
+          echo "## Diff of bincapz results" >> $GITHUB_STEP_SUMMARY
+          echo ' ' >> $GITHUB_STEP_SUMMARY
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          diff prior-results/report.md current-results/report.md || exit 0 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Add github step summary to a PR comment
         uses: actions/github-script@v4
