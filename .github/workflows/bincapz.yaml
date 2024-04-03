@@ -63,7 +63,7 @@ jobs:
           for file in $(ls current-commit); do
             if [ ! -f previous-commit/$file ]; then
                 echo "File $file does not exist in the previous commit"
-                bincapz --format=markdown current-commit/$file >> >> $GITHUB_STEP_SUMMARY
+                bincapz --format=markdown current-commit/$file >> $GITHUB_STEP_SUMMARY
             fi
             bincapz --diff --format=markdown current-commit/$file previous-commit/$file >> $GITHUB_STEP_SUMMARY
           done
