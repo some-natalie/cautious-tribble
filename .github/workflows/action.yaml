@@ -58,6 +58,9 @@ jobs:
   diff-bincapz-results:
     runs-on: ubuntu-latest
     needs: scan-with-bincapz
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Download bincapz results
         uses: actions/download-artifact@v4
@@ -81,11 +84,13 @@ jobs:
       - name: Add github step summary to a PR comment
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
           script: |
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: fs.readFileSync(process.env.GITHUB_STEP_SUMMARY, 'utf8')
-            })
+            const fs = require('fs');
+            const diff = fs.readFileSync('diff.patch', 'utf8');
+            github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## Diff of bincapz results\n\n```diff${diff}```'
+              })
