@@ -38,7 +38,7 @@ jobs:
           sudo apt-get install automake libtool make gcc pkg-config bison flex -y
           wget https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.0.tar.gz -O yara.tar.gz
           tar -xvf yara.tar.gz
-          cd yara
+          cd yara-4.5.0
           ./bootstrap.sh
           ./configure
           make
