@@ -35,7 +35,14 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install yara libyara-dev -y
+          sudo apt-get install automake libtool make gcc pkg-config bison flex -y
+          wget https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.0.tar.gz -O yara.tar.gz
+          tar -xvf yara.tar.gz
+          cd yara
+          ./bootstrap.sh
+          ./configure
+          make
+          sudo make install
 
       - name: Set up Go
         uses: actions/setup-go@v2
