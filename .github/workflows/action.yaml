@@ -61,8 +61,6 @@ jobs:
     steps:
       - name: Download bincapz results
         uses: actions/download-artifact@v4
-        with:
-          name: current-results, prior-results
 
       - name: Diff bincapz results
         run: diff prior-results/report.md current-results/report.md
