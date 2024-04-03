@@ -31,6 +31,12 @@ jobs:
 
       # do any build steps in the current-commit directory if/as needed
 
+      - name: Install yara
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install yara -y
+
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
